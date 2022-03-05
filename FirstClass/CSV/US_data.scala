@@ -30,10 +30,19 @@ object US_data {
     res2.show(false)*/
 
     //DSL(Domian Specific Language) Using spark-scala
-    val res1 = df.where($"state"==="NJ" && $"email".like("%gmail.com"))
+    /*val res1 = df.where($"state"==="NJ" && $"email".like("%gmail.com"))
     res1.show(5,false)
     val res2 = df.groupBy($"state").agg(count("*").alias("cnt")).orderBy($"cnt".desc)
-    res2.show(6,false)
+    res2.show(6,false)*/
+
+    val res = df.withColumn("fullname",concat_ws(",",$"first_name",$"last_name"))
+      .withColumn("phone1",regexp_replace($"phone1","-",""))
+      .withColumn("phone2",regexp_replace($"phone2","-",""))
+      .withColumn("state",when($"state"==="NJ","NewJersy").when($"state"==="MI","Mizoram")
+      .otherwise($"state"))
+      .withColumn("zip1",lpad($"zip",9,"0"))
+      .withColumn("zip2",rpad($"zip",9,"$"))
+    res.show(false)
 
 
     spark.stop()
